@@ -1,0 +1,92 @@
+<html>
+<head>
+<script src="http://localhost:4000/socket.io/socket.io.js"></script>
+<script src="jquery-1.7.2.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+jQuery(document).ready(function () {
+
+	var messages = function  (message,type) {
+	var li = jQuery('<li />').text(message);
+	if(type === 'updates')
+	{
+	li.css({ 'color': '#F00'});
+		jQuery('#UPDATES_log ').append(li);
+	}
+	else
+	{
+	jQuery('#logg').append(li);
+	}
+	};
+//local host at 4000
+	var socket = io.connect('http://localhost:4000');
+
+	socket.on('join', function  (data) {
+		messages(data.message,'updates');
+	});
+
+	socket.on('exit', function  (data) {
+		messages(data.message,'updates');
+	});
+
+	socket.on('msg', function  (data) {
+		messages(data.message,'msg');
+	});
+
+	
+	socket.on('error', function  (data) {
+		messages(data.message,'updates');
+	});
+
+	
+	jQuery('#chat_box').keypress(function (event) {
+		if (event.which == 13) //enter keypress value is 13
+		{
+			socket.emit('msg', {message: jQuery('#chat_box').val(),name:jQuery('#uname').val()});
+			/* clear the text box of input*/
+			jQuery('#chat_box').val('');
+		}
+	});
+});
+
+</script>
+<style type="text/css" media="screen">
+	div#listt {
+		height: 300px;
+		border: 2px solid ;
+		overflow: auto;
+		margin-bottom: 10px;
+		position: relative;
+		width:79%;
+		float:right;
+	}
+
+	ul#logg {
+		position: absolute;
+		bottom: 0px;
+	}
+	div#UPDATES{
+	height: 300px;
+		border: 2px solid ;
+		overflow: auto;
+		margin-bottom: 10px;
+		position: relative;
+		width:20%;
+		float:left;
+	}
+	
+</style>
+</head>
+<body>
+<div id="UPDATES">
+		<ul id="UPDATES_log">
+		</ul>
+	</div>
+	<div id="listt">
+		<ul id="logg">
+		</ul>
+	</div>
+	<a>NAME:</a><input type="text" name="uname" value="" id="uname" placeholder="enter your name" />
+	<a>MESSGAE:</a><input type="text" name="chat_box" value="" id="chat_box" placeholder="type to msg..." />
+
+</body>
+</html>
